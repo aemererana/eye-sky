@@ -1,9 +1,16 @@
-import { findClosestAircraft } from './geo.js';
+import { HEADING_TOLERANCE_DEG, selectAircraft } from './geo.js';
 
-const API_BASE = 'https://api.adsb.lol/v2';
-export const SEARCH_RADIUS_NM = 10;
+const API_BASE = '/api/adsb/v2';
+export const SEARCH_RADIUS_NM = 25;
+export { HEADING_TOLERANCE_DEG };
 
-export async function fetchNearbyAircraft(lat, lon, radiusNm = SEARCH_RADIUS_NM) {
+export async function fetchNearbyAircraft(
+  lat,
+  lon,
+  cameraHeading = null,
+  radiusNm = SEARCH_RADIUS_NM,
+  headingTolerance = HEADING_TOLERANCE_DEG,
+) {
   const url = `${API_BASE}/lat/${lat}/lon/${lon}/dist/${radiusNm}`;
   const response = await fetch(url);
 
@@ -18,5 +25,5 @@ export async function fetchNearbyAircraft(lat, lon, radiusNm = SEARCH_RADIUS_NM)
     return null;
   }
 
-  return findClosestAircraft(aircraft, lat, lon);
+  return selectAircraft(aircraft, lat, lon, cameraHeading, headingTolerance);
 }

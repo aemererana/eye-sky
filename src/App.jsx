@@ -2,7 +2,10 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import CoordinateModal from './components/CoordinateModal.jsx';
 import CooldownIndicator from './components/CooldownIndicator.jsx';
 import FlightCard from './components/FlightCard.jsx';
+import StatusHud from './components/StatusHud.jsx';
 import { fetchNearbyAircraft } from './utils/adsb.js';
+import { getCameraErrorMessage, requestBackCamera, stopStream } from './utils/camera.js';
+import { requestCompassPermission, startHeadingTracking } from './utils/compass.js';
 import { detectMotion, scaleBbox } from './utils/motion.js';
 import './App.css';
 
@@ -20,11 +23,14 @@ export default function App() {
   const [showOverlay, setShowOverlay] = useState(false);
   const [cooldownRemaining, setCooldownRemaining] = useState(0);
   const [cameraError, setCameraError] = useState(null);
+  const [cameraHeading, setCameraHeading] = useState(null);
+  const [apiStatus, setApiStatus] = useState({ state: 'idle', message: 'Ready' });
 
   const videoRef = useRef(null);
   const overlayCanvasRef = useRef(null);
   const analysisCanvasRef = useRef(null);
   const containerRef = useRef(null);
+  const streamRef = useRef(null);
 
   const previousFrameRef = useRef(null);
   const lastFetchTimeRef = useRef(0);
@@ -34,12 +40,62 @@ export default function App() {
   const aircraftRef = useRef(null);
   const motionRegionRef = useRef(null);
   const showOverlayRef = useRef(false);
+  const cameraHeadingRef = useRef(null);
 
-  const handleStart = useCallback((lat, lon) => {
+  const handleStart = useCallback(async (lat, lon) => {
+    setCameraError(null);
     setCoordinates({ lat, lon });
     coordinatesRef.current = { lat, lon };
-    setStarted(true);
+
+    // iOS requires permission prompts to start in the same user-gesture turn.
+    // Kick off compass + camera together before the first await.
+    const compassPromise = requestCompassPermission();
+    const cameraPromise = requestBackCamera();
+
+    let stream = null;
+
+    try {
+      const [, cameraStream] = await Promise.all([compassPromise, cameraPromise]);
+      stream = cameraStream;
+      streamRef.current = stream;
+      setStarted(true);
+    } catch (err) {
+      stopStream(stream);
+      streamRef.current = null;
+      setCameraError(getCameraErrorMessage(err));
+      console.error(err);
+    }
   }, []);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    const stream = streamRef.current;
+    if (!started || !video || !stream) return;
+
+    video.srcObject = stream;
+    video.play().catch(console.error);
+
+    return () => {
+      video.srcObject = null;
+    };
+  }, [started]);
+
+  useEffect(() => {
+    return () => {
+      streamRef.current?.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!started) return;
+
+    return startHeadingTracking((heading) => {
+      cameraHeadingRef.current = heading;
+      const rounded = Math.round(heading);
+      setCameraHeading((prev) => (prev === rounded ? prev : rounded));
+    });
+  }, [started]);
 
   useEffect(() => {
     aircraftRef.current = aircraft;
@@ -52,41 +108,6 @@ export default function App() {
   useEffect(() => {
     showOverlayRef.current = showOverlay;
   }, [showOverlay]);
-
-  useEffect(() => {
-    if (!started) return;
-
-    let stream = null;
-
-    async function startCamera() {
-      try {
-        stream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            facingMode: { ideal: 'environment' },
-            width: { ideal: 1280 },
-            height: { ideal: 720 },
-          },
-          audio: false,
-        });
-
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-          await videoRef.current.play();
-        }
-      } catch (err) {
-        setCameraError('Unable to access the camera. Please allow camera permissions.');
-        console.error(err);
-      }
-    }
-
-    startCamera();
-
-    return () => {
-      if (stream) {
-        stream.getTracks().forEach((track) => track.stop());
-      }
-    };
-  }, [started]);
 
   useEffect(() => {
     if (!started || cameraError) return;
@@ -108,18 +129,34 @@ export default function App() {
       fetchingRef.current = true;
       lastFetchTimeRef.current = Date.now();
       setCooldownRemaining(Math.ceil(COOLDOWN_MS / 1000));
+      setApiStatus({ state: 'fetching', message: 'Scanning…' });
 
       try {
-        const closest = await fetchNearbyAircraft(coords.lat, coords.lon);
+        const closest = await fetchNearbyAircraft(
+          coords.lat,
+          coords.lon,
+          cameraHeadingRef.current,
+        );
         if (closest) {
+          const callsign = (closest.flight ?? closest.r ?? 'aircraft').trim();
           setAircraft(closest);
+          setApiStatus({ state: 'success', message: `OK — ${callsign}` });
           if (Date.now() - lastMotionTimeRef.current < NO_MOTION_HIDE_MS) {
             showOverlayRef.current = true;
             setShowOverlay(true);
           }
+        } else {
+          setAircraft(null);
+          showOverlayRef.current = false;
+          setShowOverlay(false);
+          setApiStatus({ state: 'success', message: 'OK — no match in view' });
         }
       } catch (err) {
         console.error('ADS-B fetch failed:', err);
+        setApiStatus({
+          state: 'error',
+          message: err?.message ? `Error — ${err.message}` : 'Error — request failed',
+        });
       } finally {
         fetchingRef.current = false;
       }
@@ -258,7 +295,7 @@ export default function App() {
       : null;
 
   if (!started) {
-    return <CoordinateModal onStart={handleStart} />;
+    return <CoordinateModal onStart={handleStart} cameraError={cameraError} />;
   }
 
   return (
@@ -278,6 +315,8 @@ export default function App() {
       )}
 
       <CooldownIndicator secondsRemaining={cooldownRemaining} />
+
+      <StatusHud cameraHeading={cameraHeading} apiStatus={apiStatus} />
 
       {cameraError && <div className="camera-error">{cameraError}</div>}
 

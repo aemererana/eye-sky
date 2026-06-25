@@ -57,10 +57,119 @@
 }
 
 .modal-subtitle {
-  margin: 0 0 24px;
+  margin: 0 0 12px;
   font-size: 0.9rem;
   line-height: 1.5;
   color: rgba(255, 255, 255, 0.62);
+}
+
+.modal-hint {
+  margin: 0 0 20px;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: rgba(160, 210, 255, 0.85);
+}
+
+.modal-hint-loading {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.modal-warning {
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: rgba(255, 170, 60, 0.12);
+  border: 1px solid rgba(255, 170, 60, 0.35);
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: rgba(255, 220, 170, 0.95);
+}
+
+.modal-warning code {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.coord-row {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.coord-row input {
+  flex: 1;
+  min-width: 0;
+}
+
+.hemisphere-toggle {
+  display: flex;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.hemisphere-toggle button {
+  min-width: 44px;
+  padding: 12px 14px;
+  border: none;
+  background: rgba(0, 0, 0, 0.35);
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.hemisphere-toggle button + button {
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.hemisphere-toggle button.active {
+  background: rgba(77, 163, 255, 0.25);
+  color: #fff;
+}
+
+.hemisphere-toggle button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.modal-primary,
+.modal-secondary {
+  flex: 1;
+  padding: 14px 18px;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.modal-primary {
+  border: none;
+  background: linear-gradient(135deg, #4da3ff, #2b7dff);
+  color: #fff;
+}
+
+.modal-secondary {
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.modal-primary:disabled,
+.modal-secondary:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.modal-primary:active:not(:disabled),
+.modal-secondary:active:not(:disabled) {
+  transform: scale(0.98);
 }
 
 .modal form {
@@ -90,22 +199,6 @@
   outline: none;
   border-color: rgba(100, 200, 255, 0.65);
   box-shadow: 0 0 0 3px rgba(100, 200, 255, 0.15);
-}
-
-.modal button {
-  margin-top: 8px;
-  padding: 14px 18px;
-  border: none;
-  border-radius: 10px;
-  background: linear-gradient(135deg, #4da3ff, #2b7dff);
-  color: #fff;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.modal button:active {
-  transform: scale(0.98);
 }
 
 .modal-error {
@@ -188,6 +281,60 @@
   font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.72);
   pointer-events: none;
+}
+
+.status-hud {
+  position: absolute;
+  top: max(16px, env(safe-area-inset-top));
+  left: max(16px, env(safe-area-inset-left));
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 148px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(6px);
+  pointer-events: none;
+}
+
+.status-hud-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 0.75rem;
+}
+
+.status-hud-label {
+  color: rgba(255, 255, 255, 0.45);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.65rem;
+}
+
+.status-hud-value {
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 600;
+  text-align: right;
+}
+
+.status-hud-api--fetching .status-hud-value {
+  color: rgba(160, 210, 255, 0.95);
+}
+
+.status-hud-api--success .status-hud-value {
+  color: rgba(120, 230, 160, 0.95);
+}
+
+.status-hud-api--error .status-hud-value {
+  color: rgba(255, 140, 140, 0.95);
+}
+
+.status-hud-api--idle .status-hud-value {
+  color: rgba(255, 255, 255, 0.55);
 }
 
 .camera-error {
