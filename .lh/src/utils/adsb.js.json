@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/utils/adsb.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1782355153525,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1782355153525,
+            "name": "Commit-0",
+            "content": "import { HEADING_TOLERANCE_DEG, selectAircraft } from './geo.js';\n\nconst API_BASE = '/api/adsb/v2';\nexport const SEARCH_RADIUS_NM = 25;\nexport { HEADING_TOLERANCE_DEG };\n\nexport async function fetchNearbyAircraft(\n  lat,\n  lon,\n  cameraHeading = null,\n  radiusNm = SEARCH_RADIUS_NM,\n  headingTolerance = HEADING_TOLERANCE_DEG,\n) {\n  const url = `${API_BASE}/lat/${lat}/lon/${lon}/dist/${radiusNm}`;\n  const response = await fetch(url);\n\n  if (!response.ok) {\n    throw new Error(`ADS-B API error: ${response.status}`);\n  }\n\n  const data = await response.json();\n  const aircraft = data.ac ?? [];\n\n  if (aircraft.length === 0) {\n    return null;\n  }\n\n  return selectAircraft(aircraft, lat, lon, cameraHeading, headingTolerance);\n}\n"
+        }
+    ]
+}

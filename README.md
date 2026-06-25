@@ -5,7 +5,7 @@ Point your iPhone at the sky. When motion is detected, Eye Sky scans nearby ADS-
 ## Features
 
 - Fullscreen rear-camera feed with motion detection (pixel-diff, 500ms interval)
-- ADS-B lookup via [adsb.lol](https://api.adsb.lol) (25 NM radius)
+- ADS-B lookup via [adsb.lol](https://api.adsb.lol) (15 NM radius)
 - Flight info card anchored to the detected motion region
 - 10-second fetch cooldown with on-screen countdown
 
