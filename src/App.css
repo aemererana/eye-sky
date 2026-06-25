@@ -1,0 +1,203 @@
+.app {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: #000;
+  touch-action: none;
+}
+
+.camera-feed {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.overlay-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.analysis-canvas {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: radial-gradient(circle at top, #1a2744 0%, #0a0f18 55%, #05070b 100%);
+}
+
+.modal {
+  width: min(100%, 360px);
+  padding: 28px 24px;
+  border-radius: 16px;
+  background: rgba(18, 24, 36, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
+}
+
+.modal h1 {
+  margin: 0 0 8px;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #f4f7fb;
+}
+
+.modal-subtitle {
+  margin: 0 0 24px;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.modal form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.modal label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.modal input {
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
+  font-size: 1rem;
+}
+
+.modal input:focus {
+  outline: none;
+  border-color: rgba(100, 200, 255, 0.65);
+  box-shadow: 0 0 0 3px rgba(100, 200, 255, 0.15);
+}
+
+.modal button {
+  margin-top: 8px;
+  padding: 14px 18px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #4da3ff, #2b7dff);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.modal button:active {
+  transform: scale(0.98);
+}
+
+.modal-error {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #ff8a8a;
+}
+
+.flight-card {
+  position: absolute;
+  z-index: 2;
+  width: min(calc(100vw - 32px), 220px);
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(8, 12, 20, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  pointer-events: none;
+  transform: translate(-8px, -100%);
+}
+
+.flight-card-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.flight-callsign {
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #f5f8ff;
+}
+
+.flight-type {
+  font-size: 0.75rem;
+  color: rgba(160, 210, 255, 0.9);
+}
+
+.flight-card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.flight-card-grid > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.flight-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.flight-route {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.cooldown-indicator {
+  position: absolute;
+  top: max(16px, env(safe-area-inset-top));
+  right: max(16px, env(safe-area-inset-right));
+  z-index: 3;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.72);
+  pointer-events: none;
+}
+
+.camera-error {
+  position: absolute;
+  inset: auto 16px 16px;
+  z-index: 4;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: rgba(120, 20, 20, 0.85);
+  color: #fff;
+  font-size: 0.85rem;
+  text-align: center;
+}
